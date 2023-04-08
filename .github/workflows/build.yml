@@ -26,9 +26,11 @@ jobs:
   flatpak:
     name: Flatpak
     runs-on: ubuntu-latest
+    
     container:
-      image: bilelmoussaoui/flatpak-github-actions:gnome-nightly
+      image: bilelmoussaoui/flatpak-github-actions:gnome-44
       options: --privileged
+      
     strategy:
       matrix:
         arch: [x86_64, aarch64]
@@ -41,16 +43,18 @@ jobs:
       - name: Install dependencies
         run: |
           dnf -y install docker
+        if: ${{ matrix.arch == 'aarch64' }}
 
       - name: Set up QEMU
         id: qemu
         uses: docker/setup-qemu-action@v2
         with:
           platforms: arm64
+        if: ${{ matrix.arch == 'aarch64' }}
 
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
-          bundle: gradience-devel.flatpak
-          manifest-path: build-aux/flatpak/com.github.GradienceTeam.Gradience.Devel.json
-          cache-key: flatpak-builder-${{ github.sha }}
+          bundle: Gradience.flatpak
+          manifest-path: build-aux/flatpak/com.github.GradienceTeam.Gradience.json
+          cache-key: "flatpak-builder-${{ github.sha }}"
           arch: ${{ matrix.arch }}
